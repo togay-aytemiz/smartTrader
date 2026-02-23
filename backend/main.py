@@ -205,6 +205,9 @@ Top headlines:
 Write a structured investment analysis in JSON format.
 You must return a valid JSON object with the following exact keys:
 {{
+  "signal": "One of: STRONG BUY, BUY, HOLD, SELL, STRONG SELL. Base this strictly on your synthesized analysis of all data provided.",
+  "score": "An integer from 0 to 100 representing your conviction in the stock's overall health and upside.",
+  "momentum_signal": "One of: STRONG BULLISH, BULLISH, NEUTRAL, BEARISH, STRONG BEARISH.",
   "summary": "1 sentence high-level overview of the verdict.",
   "pros": ["Pro point 1", "Pro point 2", "Pro point 3"],
   "cons": ["Con point 1", "Con point 2", "Con point 3"],

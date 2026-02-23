@@ -187,6 +187,14 @@ export default function App() {
         setView('portfolio');
     };
 
+    // AI commentary (New source of truth for signals)
+    const aiData = data?.ai_commentary;
+    const isStructured = typeof aiData === 'object' && aiData !== null;
+
+    const aiScoreStr = isStructured && aiData.score ? parseInt(aiData.score, 10) : null;
+    const aiSignalStr = isStructured && aiData.signal ? aiData.signal : null;
+    const aiMomentumStr = isStructured && aiData.momentum_signal ? aiData.momentum_signal : null;
+
     // Derived data
     const sig = data?.signal;
     const price = data?.fundamentals?.price;
@@ -197,15 +205,16 @@ export default function App() {
     const sent = data?.sentiment || {};
     const tokenUsage = data?.token_usage || { total_tokens: 0, total_cost: 0, breakdown: [] };
     const composite = sig?.composite_score ?? 0;
-    const signalText = sig?.overall || '—';
+
+    const signalText = aiSignalStr || sig?.overall || '—';
     const isGreen = signalText.includes('BUY');
     const isRed = signalText.includes('SELL');
     const signalColor = isGreen ? 'var(--c-green)' : isRed ? 'var(--c-red)' : 'var(--c-yellow)';
     const signalStrength = signalText.includes('STRONG') ? 'Strong' : '';
     const upside = sig?.upside_pct;
-    const aiScore = Math.round(((composite + 2) / 4) * 100);
+    const aiScore = aiScoreStr !== null ? aiScoreStr : Math.round(((composite + 2) / 4) * 100);
 
-    const momentumText = sig?.momentum_signal || '—';
+    const momentumText = aiMomentumStr || sig?.momentum_signal || '—';
     const isMomGreen = momentumText.includes('BULLISH');
     const isMomRed = momentumText.includes('BEARISH');
     const momentumColor = isMomGreen ? 'var(--c-green)' : isMomRed ? 'var(--c-red)' : 'var(--c-yellow)';
@@ -225,9 +234,7 @@ export default function App() {
     const headlines = sent.top_headlines || [];
     const fvColor = fv && price ? (fv > price ? 'var(--c-green)' : 'var(--c-red)') : 'var(--c-muted)';
 
-    // AI commentary
-    const aiData = data?.ai_commentary;
-    const isStructured = typeof aiData === 'object' && aiData !== null;
+    // Extract commentary body
     const aiSummary = isStructured ? aiData.summary : '';
     const aiPros = isStructured && Array.isArray(aiData.pros) ? aiData.pros : [];
     const aiCons = isStructured && Array.isArray(aiData.cons) ? aiData.cons : [];
