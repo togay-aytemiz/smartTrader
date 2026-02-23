@@ -1,0 +1,223 @@
+<!DOCTYPE html>
+<html lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>Professional Stock Analysis - Search</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600&amp;family=JetBrains+Mono:wght@400;500;700&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script>
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    colors: {
+                        bg: "#050505",
+                        surface: "#0F0F0F",
+                        border: "#1A1A1A",
+                        accent: {
+                            red: "#FF453A",
+                            green: "#32D74B",
+                            yellow: "#FFD60A",
+                            blue: "#0A84FF",
+                            darkRed: "#3A0F0F"
+                        }
+                    },
+                    fontFamily: {
+                        sans: ["Inter", "sans-serif"],
+                        mono: ["JetBrains Mono", "monospace"],
+                    },
+                    spacing: {
+                        'compact': '0.5rem',
+                    },
+                    animation: {
+                        'grid-move': 'grid-move 20s linear infinite',
+                    },
+                    keyframes: {
+                        'grid-move': {
+                            '0%': { backgroundPosition: '0 0' },
+                            '100%': { backgroundPosition: '40px 40px' },
+                        }
+                    }
+                },
+            },
+        };
+    </script>
+<style type="text/tailwindcss">
+        :root {
+            --bg-dark: #050505;
+            --surface: #0F0F0F;
+            --border: #1A1A1A;
+        }
+        body {
+            background-color: var(--bg-dark);
+            color: #E5E7EB;
+            font-family: 'Inter', sans-serif;
+            letter-spacing: -0.01em;
+        }
+        .mono-data {
+            font-family: 'JetBrains Mono', monospace;
+            letter-spacing: -0.02em;
+        }
+        .glass-panel {
+            background: rgba(20, 20, 20, 0.6);
+            backdrop-filter: blur(12px);
+            border: 1px solid rgba(255, 255, 255, 0.08);
+            box-shadow: 0 4px 24px rgba(0, 0, 0, 0.4);
+        }
+        .search-glass {
+            background: rgba(30, 30, 30, 0.4);
+            backdrop-filter: blur(8px);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            transition: all 0.3s ease;
+        }
+        .search-glass:focus-within {
+            background: rgba(40, 40, 40, 0.6);
+            border-color: rgba(10, 132, 255, 0.5);
+            box-shadow: 0 0 0 4px rgba(10, 132, 255, 0.1);
+        }
+        .trending-card {
+            background: rgba(255, 255, 255, 0.03);
+            border: 1px solid rgba(255, 255, 255, 0.05);
+            transition: all 0.2s ease;
+        }
+        .trending-card:hover {
+            background: rgba(255, 255, 255, 0.07);
+            transform: translateY(-2px);
+            border-color: rgba(255, 255, 255, 0.1);
+        }
+        .material-symbols-outlined {
+            font-variation-settings: 'FILL' 0, 'wght' 300, 'GRAD' 0, 'opsz' 20;
+        }
+        .grid-bg {
+            background-image: 
+                linear-gradient(rgba(255, 255, 255, 0.03) 1px, transparent 1px),
+                linear-gradient(90deg, rgba(255, 255, 255, 0.03) 1px, transparent 1px);
+            background-size: 40px 40px;
+        }
+    </style>
+</head>
+<body class="dark overflow-hidden text-gray-300 selection:bg-accent-blue/30 selection:text-white h-screen flex flex-col relative">
+<div class="absolute inset-0 grid-bg animate-grid-move pointer-events-none z-0 opacity-50"></div>
+<div class="absolute inset-0 bg-gradient-to-b from-transparent via-[#050505]/50 to-[#050505] pointer-events-none z-0"></div>
+<nav class="sticky top-0 z-50 bg-[#050505]/80 backdrop-blur-md border-b border-white/5 h-14 flex items-center">
+<div class="w-full max-w-[1920px] mx-auto px-6 flex justify-between items-center">
+<div class="flex items-center gap-8">
+<div class="flex items-center gap-2">
+<span class="material-symbols-outlined text-accent-blue text-2xl">insights</span>
+<span class="font-semibold text-sm tracking-tight uppercase text-white">SmartTrader <span class="text-[10px] font-normal text-gray-500 ml-0.5">PRO</span></span>
+</div>
+<div class="hidden md:flex gap-6 text-[11px] uppercase tracking-widest text-gray-400 font-medium">
+<a class="text-white relative after:absolute after:-bottom-5 after:left-0 after:w-full after:h-0.5 after:bg-accent-blue" href="#">Search</a>
+<a class="hover:text-white transition-colors" href="#">Portfolio</a>
+<a class="hover:text-white transition-colors" href="#">Market News</a>
+</div>
+</div>
+<div class="flex items-center gap-4">
+<button class="material-symbols-outlined text-gray-500 hover:text-white text-xl transition-colors">notifications</button>
+<button class="flex items-center gap-2 text-gray-400 hover:text-white transition-colors group">
+<span class="text-xs font-medium group-hover:text-white">JD</span>
+<span class="material-symbols-outlined text-xl">account_circle</span>
+</button>
+</div>
+</div>
+</nav>
+<main class="relative z-10 flex-1 flex flex-col items-center justify-center w-full max-w-5xl mx-auto px-4 -mt-10">
+<div class="w-full max-w-2xl text-center space-y-8 animate-[fadeIn_0.6s_ease-out]">
+<div class="space-y-2">
+<h1 class="text-3xl md:text-4xl font-light text-white tracking-tight">
+                    Welcome back.
+                </h1>
+<p class="text-lg md:text-xl text-gray-400 font-light">
+                    Which asset are we analyzing today?
+                </p>
+</div>
+<div class="relative group max-w-xl mx-auto w-full">
+<div class="search-glass rounded-full flex items-center p-2 pr-4 transition-all">
+<div class="pl-4 pr-3 text-gray-500">
+<span class="material-symbols-outlined text-2xl group-focus-within:text-accent-blue transition-colors">search</span>
+</div>
+<input autofocus="" class="bg-transparent border-none focus:ring-0 text-white placeholder-gray-600 text-lg w-full h-10 font-light" placeholder="Search ticker, company, or crypto..." type="text"/>
+<div class="hidden md:flex items-center gap-2 text-xs text-gray-600 border-l border-white/10 pl-3">
+<span class="material-symbols-outlined text-sm">keyboard_command_key</span>
+<span>K</span>
+</div>
+</div>
+</div>
+<div class="pt-8 w-full">
+<div class="flex items-center gap-2 mb-4 justify-center md:justify-start pl-1">
+<span class="material-symbols-outlined text-accent-green text-sm animate-pulse">trending_up</span>
+<h2 class="text-[10px] font-bold uppercase tracking-widest text-gray-500">Trending Now</h2>
+</div>
+<div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+<a class="trending-card rounded-lg p-4 flex items-center justify-between group cursor-pointer" href="#">
+<div class="flex items-center gap-3">
+<div class="w-8 h-8 rounded bg-white/5 flex items-center justify-center text-xs font-bold text-white">
+<img alt="AAPL" class="w-5 h-5 opacity-80 group-hover:opacity-100 transition-opacity" onerror="this.style.display='none'" src="https://lh3.googleusercontent.com/aida-public/AB6AXuBoB1vt_1vI7lTkJmiNf6wOqVKB6CniV96Ur5F_NpJAt00fxiRUqri9YY9NIl35x2_vh6Jb8S1VuxCIiNG7b6EyAkSwlcv_B3nlSuEaoxOk594FecPwZxvyirGdaILZkMo8DzjRREGCvWiFy4hBieXF3pnkqUQOvsdHVlyPP-uefdTIjkKTrwDwvk1Ab4DV57re17MBBPQ79kYutJhnsqdKy8bzcG-VdmbRlC_XtWFbPfrB6EZkoHVbG-3TctZbE_YYxHVHKCu6ouM"/>
+<span class="material-symbols-outlined text-gray-400" style="display:none">phone_iphone</span>
+</div>
+<div class="text-left">
+<div class="text-sm font-semibold text-white group-hover:text-accent-blue transition-colors">AAPL</div>
+<div class="text-[10px] text-gray-500">Apple Inc.</div>
+</div>
+</div>
+<div class="text-right">
+<div class="text-sm font-mono font-medium text-white">$182.63</div>
+<div class="text-[10px] font-mono text-accent-green flex items-center justify-end gap-0.5">
+<span class="material-symbols-outlined text-[10px]">arrow_drop_up</span>
+                                1.2%
+                            </div>
+</div>
+</a>
+<a class="trending-card rounded-lg p-4 flex items-center justify-between group cursor-pointer" href="#">
+<div class="flex items-center gap-3">
+<div class="w-8 h-8 rounded bg-white/5 flex items-center justify-center text-xs font-bold text-white">
+<img alt="TSLA" class="w-5 h-5 opacity-80 group-hover:opacity-100 transition-opacity" onerror="this.style.display='none'" src="https://lh3.googleusercontent.com/aida-public/AB6AXuAb_bxlbclZayMVerMwehyoSrN-oELS5n3mPMUu4lXSNKT11Uj7WsRtnq3Uoy-L-QlMRhAUI90KbNBgFFVtkbenDuzadFaOzCzcFclq5pbzz6_m9Chri7QhdM1Ov5B_MLfUi6SgRMo8D2Hxyhu5bpT_Ncz37VN9IJQMIGFlt6iLoQeO5BvEz8vBosIKI2YQmVAwVqlE7wERHAPUGL-gd5Wqv8VgRUKBUurbGzb6bBmKW5w-gRBdi0LEoB5MZfcJCyR5DMHubSBtpRo"/>
+<span class="material-symbols-outlined text-gray-400" style="display:none">electric_car</span>
+</div>
+<div class="text-left">
+<div class="text-sm font-semibold text-white group-hover:text-accent-blue transition-colors">TSLA</div>
+<div class="text-[10px] text-gray-500">Tesla, Inc.</div>
+</div>
+</div>
+<div class="text-right">
+<div class="text-sm font-mono font-medium text-white">$234.12</div>
+<div class="text-[10px] font-mono text-accent-red flex items-center justify-end gap-0.5">
+<span class="material-symbols-outlined text-[10px]">arrow_drop_down</span>
+                                0.8%
+                            </div>
+</div>
+</a>
+<a class="trending-card rounded-lg p-4 flex items-center justify-between group cursor-pointer" href="#">
+<div class="flex items-center gap-3">
+<div class="w-8 h-8 rounded bg-white/5 flex items-center justify-center text-xs font-bold text-white">
+<span class="material-symbols-outlined text-accent-yellow">currency_bitcoin</span>
+</div>
+<div class="text-left">
+<div class="text-sm font-semibold text-white group-hover:text-accent-blue transition-colors">BTC</div>
+<div class="text-[10px] text-gray-500">Bitcoin</div>
+</div>
+</div>
+<div class="text-right">
+<div class="text-sm font-mono font-medium text-white">$64,230</div>
+<div class="text-[10px] font-mono text-accent-green flex items-center justify-end gap-0.5">
+<span class="material-symbols-outlined text-[10px]">arrow_drop_up</span>
+                                3.4%
+                            </div>
+</div>
+</a>
+</div>
+</div>
+</div>
+</main>
+<footer class="absolute bottom-0 left-0 w-full border-t border-white/5 py-3 z-10 bg-[#050505]">
+<div class="max-w-[1920px] mx-auto px-6 flex justify-between items-center">
+<p class="text-[9px] text-gray-600 uppercase tracking-widest font-medium">© 2024 Market Intelligence Systems</p>
+<div class="flex gap-4 text-[9px] text-gray-600 font-medium">
+<a class="hover:text-gray-400 uppercase transition-colors" href="#">Compliance</a>
+<a class="hover:text-gray-400 uppercase transition-colors" href="#">Risk Disclosure</a>
+</div>
+</div>
+</footer>
+
+</body></html>

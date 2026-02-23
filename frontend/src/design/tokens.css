@@ -1,0 +1,121 @@
+/*
+ * SmartTrader — Design Tokens
+ * Inspired by Relatel dashboard aesthetic
+ * Font: Plus Jakarta Sans
+ * ─────────────────────────────────────────────────────────────────
+ */
+
+@import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&display=swap');
+
+:root {
+  /* ── Typography ──────────────────────────────────────────────── */
+  --font-family:       'Plus Jakarta Sans', -apple-system, BlinkMacSystemFont, sans-serif;
+  --font-mono:         'SF Mono', 'Fira Code', monospace;
+
+  --fs-xs:   11px;
+  --fs-sm:   12px;
+  --fs-base: 14px;
+  --fs-md:   15px;
+  --fs-lg:   18px;
+  --fs-xl:   22px;
+  --fs-2xl:  28px;
+  --fs-3xl:  36px;
+
+  --fw-normal:  400;
+  --fw-medium:  500;
+  --fw-semi:    600;
+  --fw-bold:    700;
+  --fw-extra:   800;
+
+  --lh-tight:   1.2;
+  --lh-normal:  1.5;
+  --lh-relaxed: 1.7;
+
+  --ls-tight:   -0.5px;
+  --ls-normal:  0;
+  --ls-wide:    0.5px;
+  --ls-wider:   1px;
+  --ls-widest:  1.5px;
+
+  /* ── Colors — Backgrounds ───────────────────────────────────── */
+  --bg-base:        #0c0c0e;
+  --bg-surface:     #141416;
+  --bg-card:        #1a1a1e;
+  --bg-card-hover:  #222226;
+  --bg-elevated:    #2a2a2e;
+  --bg-input:       #18181c;
+
+  /* ── Colors — Borders ───────────────────────────────────────── */
+  --border:         rgba(255, 255, 255, 0.06);
+  --border-hover:   rgba(255, 255, 255, 0.10);
+  --border-active:  rgba(124, 58, 237, 0.45);
+  --border-subtle:  rgba(255, 255, 255, 0.04);
+
+  /* ── Colors — Accent ────────────────────────────────────────── */
+  --accent:         #7c3aed;
+  --accent-light:   #a78bfa;
+  --accent-glow:    rgba(124, 58, 237, 0.15);
+  --accent-subtle:  rgba(124, 58, 237, 0.08);
+
+  /* ── Colors — Semantic ──────────────────────────────────────── */
+  --green:          #22c55e;
+  --green-soft:     #4ade80;
+  --green-bg:       rgba(34, 197, 94, 0.10);
+  --green-border:   rgba(34, 197, 94, 0.20);
+
+  --red:            #ef4444;
+  --red-soft:       #f87171;
+  --red-bg:         rgba(239, 68, 68, 0.10);
+  --red-border:     rgba(239, 68, 68, 0.20);
+
+  --yellow:         #f59e0b;
+  --yellow-soft:    #fbbf24;
+  --yellow-bg:      rgba(245, 158, 11, 0.10);
+  --yellow-border:  rgba(245, 158, 11, 0.20);
+
+  --blue:           #3b82f6;
+  --blue-soft:      #60a5fa;
+  --blue-bg:        rgba(59, 130, 246, 0.10);
+  --blue-border:    rgba(59, 130, 246, 0.20);
+
+  --cyan:           #06b6d4;
+  --cyan-bg:        rgba(6, 182, 212, 0.10);
+
+  /* ── Colors — Text ──────────────────────────────────────────── */
+  --text-primary:   #f0f0f2;
+  --text-secondary: #8a8a96;
+  --text-muted:     #54545e;
+  --text-dimmed:    #3a3a42;
+
+  /* ── Spacing ────────────────────────────────────────────────── */
+  --space-1:  4px;
+  --space-2:  8px;
+  --space-3:  12px;
+  --space-4:  16px;
+  --space-5:  20px;
+  --space-6:  24px;
+  --space-8:  32px;
+  --space-10: 40px;
+  --space-12: 48px;
+
+  /* ── Radius ─────────────────────────────────────────────────── */
+  --radius-xs:   4px;
+  --radius-sm:   6px;
+  --radius-md:   10px;
+  --radius-lg:   14px;
+  --radius-xl:   18px;
+  --radius-2xl:  24px;
+  --radius-pill: 999px;
+
+  /* ── Shadows ────────────────────────────────────────────────── */
+  --shadow-sm:   0 1px 2px rgba(0, 0, 0, 0.3);
+  --shadow-card: 0 2px 12px rgba(0, 0, 0, 0.35);
+  --shadow-lg:   0 8px 32px rgba(0, 0, 0, 0.45);
+  --shadow-glow: 0 0 30px rgba(124, 58, 237, 0.12);
+
+  /* ── Transitions ────────────────────────────────────────────── */
+  --ease-out:  cubic-bezier(0.16, 1, 0.3, 1);
+  --ease-in:   cubic-bezier(0.55, 0, 1, 0.45);
+  --duration:  180ms;
+  --duration-slow: 300ms;
+}
