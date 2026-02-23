@@ -3306,6 +3306,7 @@ body {
 .st-modal-news-score.red {
   color: var(--c-red);
 }
+
 /* ── Advanced Metrics Banner (Volatility, Flow, Macro) ─── */
 .st-metrics-banner {
   display: grid;
@@ -3491,4 +3492,46 @@ body {
   font-size: 10px;
   color: #6b7280;
   line-height: 1.6;
+}
+
+/* ── Collapsible Sidebar Section ─── */
+.st-collapsible-section {
+  border-bottom: 1px solid var(--st-border);
+  background: #0C0C0C;
+}
+
+.st-collapsible-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 16px 20px;
+  cursor: pointer;
+  user-select: none;
+  transition: background 0.2s;
+}
+
+.st-collapsible-header:hover {
+  background: rgba(255, 255, 255, 0.03);
+}
+
+.st-collapsible-title-row {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.st-collapsible-chevron {
+  color: #6b7280;
+  font-size: 16px;
+  transition: transform 0.2s ease-in-out;
+}
+
+.st-collapsible-extra {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.st-collapsible-content {
+  padding: 0 20px 20px 20px;
 }

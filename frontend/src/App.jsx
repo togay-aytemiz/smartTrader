@@ -20,6 +20,7 @@ import HeroBanner from './components/HeroBanner';
 import AiAnalysisCard from './components/AiAnalysisCard';
 import MetricsBanner from './components/MetricsBanner';
 import ConvergenceBlock from './components/ConvergenceBlock';
+import CollapsibleSection from './components/CollapsibleSection';
 const API = 'http://localhost:8000';
 
 
@@ -421,8 +422,6 @@ export default function App() {
                                     </div>
                                 </section>
 
-                                {data.advanced_metrics && <MetricsBanner data={data} />}
-
                                 {/* AI Analysis — redesigned inline */}
                                 <section className="st-section st-ai-section">
                                     <div className="st-ai-head" style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
@@ -510,11 +509,107 @@ export default function App() {
                             {/* ─── RIGHT SIDEBAR ─── */}
                             <aside className="st-right">
                                 {/* AI Convergence */}
-                                {data.advanced_metrics && <ConvergenceBlock data={data} />}
+                                {data.advanced_metrics && (
+                                    <CollapsibleSection title="AI Convergence" defaultOpen={true}>
+                                        <div style={{ marginLeft: '-20px', marginRight: '-20px', marginTop: '-16px' }}>
+                                            <ConvergenceBlock data={data} />
+                                        </div>
+                                    </CollapsibleSection>
+                                )}
+
+                                {/* Volatility */}
+                                {volatility && (
+                                    <CollapsibleSection title="Volatility Analysis" defaultOpen={true} extraHeader={<span className="st-metric-badge yellow">30D Metrics</span>}>
+                                        <div style={{ display: 'flex', flexDirection: 'column', gap: '16px' }}>
+                                            <div className="st-metric-row">
+                                                <div>
+                                                    <p className="st-metric-subtext">Implied Vol (Proxy)</p>
+                                                    <p className="st-metric-val-large">{volatility.implied_volatility}%</p>
+                                                </div>
+                                                <div style={{ textAlign: 'right' }}>
+                                                    <p className="st-metric-badge" style={{ border: 'none', padding: 0, color: volatility.vol_diff_pct > 0 ? "var(--c-red)" : "var(--c-green)" }}>
+                                                        {volatility.vol_diff_pct > 0 ? '+' : ''}{volatility.vol_diff_pct}% vs Hist
+                                                    </p>
+                                                    <div style={{ width: '96px', height: '4px', background: 'var(--st-border)', borderRadius: '9999px', overflow: 'hidden', marginTop: '4px', marginLeft: 'auto' }}>
+                                                        <div style={{ height: '100%', background: 'var(--c-red)', width: `${Math.min(100, Math.max(0, 50 + volatility.vol_diff_pct))}%` }}></div>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                            <div className="st-mini-cards">
+                                                <div className="st-mini-card" style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', padding: '6px 8px' }}>
+                                                    <span className="st-metric-subtext" style={{ fontSize: '8px', marginBottom: 0, whiteSpace: 'nowrap' }}>BETA (1Y PROXY)</span>
+                                                    <span className="st-metric-val-large" style={{ fontSize: '12px', whiteSpace: 'nowrap' }}>{data.fundamentals?.beta?.toFixed(2) || '—'}</span>
+                                                </div>
+                                                <div className="st-mini-card" style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', padding: '6px 8px' }}>
+                                                    <span className="st-metric-subtext" style={{ fontSize: '8px', marginBottom: 0, whiteSpace: 'nowrap' }}>AVG RANGE</span>
+                                                    <span className="st-metric-val-large" style={{ fontSize: '12px', whiteSpace: 'nowrap' }}>{volatility.avg_range_pct}%</span>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </CollapsibleSection>
+                                )}
+
+                                {/* Institutional Flow */}
+                                {flow && (
+                                    <CollapsibleSection title="Institutional Flow" defaultOpen={true}
+                                        extraHeader={<span className="st-metric-badge" style={{ background: flow.net_flow_usd > 0 ? 'rgba(50, 215, 75, 0.1)' : 'rgba(255, 69, 58, 0.1)', color: flow.net_flow_usd > 0 ? 'var(--c-green)' : 'var(--c-red)', borderColor: flow.net_flow_usd > 0 ? 'rgba(50, 215, 75, 0.2)' : 'rgba(255, 69, 58, 0.2)' }}>{flow.flow_status}</span>}>
+                                        <div className="st-flow-bar-container">
+                                            <div className="st-flow-labels">
+                                                <span>NET SELL</span>
+                                                <span>NET BUY</span>
+                                            </div>
+                                            <div className="st-flow-bar">
+                                                <div style={{ height: '100%', display: 'flex', alignItems: 'center', justifyContent: 'center', transition: 'all 0.3s', width: `${flow.sell_pressure_pct}%`, backgroundColor: 'var(--c-red)' }}>
+                                                    {flow.sell_pressure_pct > 60 && <span style={{ fontSize: '10px', fontWeight: 700, color: 'black', textTransform: 'uppercase' }}>Selling</span>}
+                                                </div>
+                                                <div style={{ height: '100%', display: 'flex', alignItems: 'center', justifyContent: 'center', transition: 'all 0.3s', width: `${flow.buy_pressure_pct}%`, backgroundColor: 'var(--c-green)' }}>
+                                                    {flow.buy_pressure_pct > 60 && <span style={{ fontSize: '10px', fontWeight: 700, color: 'black', textTransform: 'uppercase' }}>Buying</span>}
+                                                </div>
+                                            </div>
+                                            <div className="st-metric-row" style={{ marginTop: '12px', marginBottom: 0 }}>
+                                                <span className="st-metric-subtext" style={{ color: '#9ca3af', fontSize: '10px' }}>Est. Block Net (30D)</span>
+                                                <span className="st-metric-val-large" style={{ fontSize: '10px', color: flow.net_flow_usd > 0 ? 'var(--c-green)' : 'var(--c-red)' }}>
+                                                    {flow.net_flow_usd > 0 ? '+' : ''}${(flow.net_flow_usd / 1e6).toFixed(1)}M
+                                                </span>
+                                            </div>
+                                        </div>
+                                    </CollapsibleSection>
+                                )}
+
+                                {/* Macro Sentiment */}
+                                {macro && (
+                                    <CollapsibleSection title="Macro Sentiment" defaultOpen={true} extraHeader={<span className="material-symbols-outlined" style={{ color: '#4b5563', fontSize: '16px' }}>public</span>}>
+                                        <div style={{ display: 'flex', flexDirection: 'column', gap: '12px' }}>
+                                            <div className="st-macro-item">
+                                                <div className="st-macro-icon">
+                                                    <span className="material-symbols-outlined" style={{ fontSize: '14px', color: macroRateColor }}>percent</span>
+                                                </div>
+                                                <div style={{ flex: 1 }}>
+                                                    <div className="st-macro-text-row">
+                                                        <span style={{ fontSize: '10px', color: '#d1d5db', fontWeight: 500 }}>Interest Rates</span>
+                                                        <span style={{ fontSize: '10px', fontWeight: 700, textTransform: 'uppercase', color: macroRateColor }}>{macro.rates}</span>
+                                                    </div>
+                                                    <p style={{ fontSize: '8px', color: '#6b7280', margin: '4px 0 0 0' }}>{macro.rates_desc}</p>
+                                                </div>
+                                            </div>
+                                            <div className="st-macro-item">
+                                                <div className="st-macro-icon">
+                                                    <span className="material-symbols-outlined" style={{ fontSize: '14px', color: macroInfColor }}>shopping_cart</span>
+                                                </div>
+                                                <div style={{ flex: 1 }}>
+                                                    <div className="st-macro-text-row">
+                                                        <span style={{ fontSize: '10px', color: '#d1d5db', fontWeight: 500 }}>Inflation (CPI)</span>
+                                                        <span style={{ fontSize: '10px', fontWeight: 700, textTransform: 'uppercase', color: macroInfColor }}>{macro.inflation}</span>
+                                                    </div>
+                                                    <p style={{ fontSize: '8px', color: '#6b7280', margin: '4px 0 0 0' }}>{macro.inflation_desc}</p>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </CollapsibleSection>
+                                )}
 
                                 {/* Financial Health */}
-                                <div className="st-sidebar-section">
-                                    <h3 className="st-sidebar-title">Financial Health</h3>
+                                <CollapsibleSection title="Financial Health" defaultOpen={true}>
                                     <div className="st-metric-grid">
                                         {[
                                             { label: 'P/E (TTM)', key: 'pe', val: f.pe_ratio, fmt: v => v?.toFixed(2) },
@@ -529,24 +624,19 @@ export default function App() {
                                             </div>
                                         ))}
                                     </div>
-                                </div>
+                                </CollapsibleSection>
 
                                 {/* DCF Model */}
-                                <div className="st-sidebar-section st-dcf-bg">
-                                    <div className="st-sidebar-title-row">
-                                        <h3 className="st-sidebar-title">DCF Model</h3>
-                                        {data.web_enriched && (
-                                            <span className="st-web-badge">
-                                                <span className="material-symbols-outlined" style={{ fontSize: 11 }}>language</span>Web-Enriched
-                                            </span>
-                                        )}
-                                    </div>
+                                <CollapsibleSection
+                                    title="DCF Model"
+                                    defaultOpen={true}
+                                    extraHeader={data.web_enriched ? <span className="st-web-badge"><span className="material-symbols-outlined" style={{ fontSize: 11 }}>language</span>Web-Enriched</span> : null}
+                                >
                                     <div className="st-dcf-rows">
                                         <div className="st-dcf-row"><span>Free Cash Flow</span><span className="st-dcf-val">{fmtLarge(data.latest_fcf)}</span></div>
                                         <div className="st-dcf-row"><span>WACC / Terminal</span><span className="st-dcf-val">{`${dcf.discount_rate ? `${(dcf.discount_rate * 100).toFixed(0)}%` : '—'} / ${dcf.terminal_growth ? `${(dcf.terminal_growth * 100).toFixed(0)}%` : '—'}`}</span></div>
                                         <div className="st-dcf-row"><span>MoS / Intrinsic</span><span className="st-dcf-val">{`${dcf.margin_of_safety ? `${(dcf.margin_of_safety * 100).toFixed(0)}%` : '—'} / $${dcf.intrinsic_per_share?.toFixed(2) || '—'}`}</span></div>
                                     </div>
-                                    {/* Year-by-year Growth Projections */}
                                     {dcf.projected_fcfs && dcf.projected_fcfs.length > 1 && (
                                         <div className="st-growth-projections">
                                             <div className="st-growth-label">Growth Projections</div>
@@ -581,11 +671,10 @@ export default function App() {
                                     {data.dcf_research?.analyst_source && (
                                         <div className="st-dcf-source">📡 {data.dcf_research.analyst_source}</div>
                                     )}
-                                </div>
+                                </CollapsibleSection>
 
                                 {/* Sentiment */}
-                                <div className="st-sidebar-section">
-                                    <h3 className="st-sidebar-title">Sentiment</h3>
+                                <CollapsibleSection title="Sentiment" defaultOpen={true}>
                                     <div className="st-sent-header" style={{ background: `${sentColor}08`, borderColor: `${sentColor}1a` }}>
                                         <div className="st-sent-icon" style={{ background: `${sentColor}15` }}>
                                             <span className="material-symbols-outlined" style={{ color: sentColor, fontSize: 14 }}>{sentPositive ? 'trending_up' : 'trending_down'}</span>
@@ -613,11 +702,10 @@ export default function App() {
                                             Show All {headlines.length} Headlines
                                         </button>
                                     )}
-                                </div>
+                                </CollapsibleSection>
 
                                 {/* Technicals */}
-                                <div className="st-sidebar-section">
-                                    <h3 className="st-sidebar-title">Technicals</h3>
+                                <CollapsibleSection title="Technicals" defaultOpen={true}>
                                     <div className="st-tech-rsi">
                                         <div className="st-tech-rsi-label">RSI (14)</div>
                                         <div className="st-tech-rsi-right">
@@ -633,7 +721,7 @@ export default function App() {
                                             </div>
                                         ))}
                                     </div>
-                                </div>
+                                </CollapsibleSection>
                             </aside>
                         </main>
                     )}
