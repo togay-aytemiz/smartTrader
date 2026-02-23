@@ -253,6 +253,10 @@ export default function App() {
     const rsi = tech.rsi_14;
     const rsiLabel = rsi > 70 ? 'Overbought' : rsi < 30 ? 'Oversold' : 'Neutral';
 
+    const convScore = (sma50Signal === 'BUY' ? 1 : 0) + (macdSignal === 'BUY' ? 1 : 0) + (rsi < 40 ? 1 : 0);
+    const convLabel = convScore >= 2 ? 'Bullish' : 'Bearish';
+    const convColor = convScore >= 2 ? 'var(--c-green)' : 'var(--c-red)';
+
     // Sentiment
     const sentLabel = sent.sentiment_label || 'Neutral';
     const sentPositive = sentLabel.toLowerCase().includes('positive') || sentLabel.toLowerCase().includes('bullish');
@@ -554,7 +558,7 @@ export default function App() {
                             <aside className="st-right">
                                 {/* AI Convergence */}
                                 {data.advanced_metrics && (
-                                    <CollapsibleSection title="AI Convergence" defaultOpen={true}>
+                                    <CollapsibleSection title="AI Convergence" defaultOpen={false} extraHeader={<span className="st-metric-badge" style={{ color: convColor, background: `${convColor}15`, borderColor: `${convColor}33` }}>{convLabel}</span>}>
                                         <div style={{ marginLeft: '-20px', marginRight: '-20px', marginTop: '-16px' }}>
                                             <ConvergenceBlock data={data} />
                                         </div>
@@ -563,7 +567,7 @@ export default function App() {
 
                                 {/* Volatility */}
                                 {volatility && (
-                                    <CollapsibleSection title="Volatility Analysis" defaultOpen={true} extraHeader={<span className="st-metric-badge yellow">30D Metrics</span>}>
+                                    <CollapsibleSection title="Volatility Analysis" defaultOpen={false} extraHeader={<span className="st-metric-badge" style={{ color: volatility.vol_diff_pct > 0 ? "var(--c-red)" : "var(--c-green)", background: volatility.vol_diff_pct > 0 ? "rgba(255, 69, 58, 0.1)" : "rgba(50, 215, 75, 0.1)", borderColor: volatility.vol_diff_pct > 0 ? "rgba(255, 69, 58, 0.2)" : "rgba(50, 215, 75, 0.2)" }}>{volatility.vol_diff_pct > 0 ? '+' : ''}{volatility.vol_diff_pct}% vs Hist</span>}>
                                         <div style={{ display: 'flex', flexDirection: 'column', gap: '16px' }}>
                                             <div className="st-metric-row">
                                                 <div>
@@ -595,8 +599,8 @@ export default function App() {
 
                                 {/* Institutional Flow */}
                                 {flow && (
-                                    <CollapsibleSection title="Institutional Flow" defaultOpen={true}
-                                        extraHeader={<span className="st-metric-badge" style={{ background: flow.net_flow_usd > 0 ? 'rgba(50, 215, 75, 0.1)' : 'rgba(255, 69, 58, 0.1)', color: flow.net_flow_usd > 0 ? 'var(--c-green)' : 'var(--c-red)', borderColor: flow.net_flow_usd > 0 ? 'rgba(50, 215, 75, 0.2)' : 'rgba(255, 69, 58, 0.2)' }}>{flow.flow_status}</span>}>
+                                    <CollapsibleSection title="Institutional Flow" defaultOpen={false}
+                                        extraHeader={<span className="st-metric-badge" style={{ background: flow.net_flow_usd > 0 ? 'rgba(50, 215, 75, 0.1)' : 'rgba(255, 69, 58, 0.1)', color: flow.net_flow_usd > 0 ? 'var(--c-green)' : 'var(--c-red)', borderColor: flow.net_flow_usd > 0 ? 'rgba(50, 215, 75, 0.2)' : 'rgba(255, 69, 58, 0.2)' }}>{flow.flow_status.toUpperCase()}</span>}>
                                         <div className="st-flow-bar-container">
                                             <div className="st-flow-labels">
                                                 <span>NET SELL</span>
@@ -622,7 +626,11 @@ export default function App() {
 
                                 {/* Macro Sentiment */}
                                 {macro && (
-                                    <CollapsibleSection title="Macro Sentiment" defaultOpen={true} extraHeader={<span className="material-symbols-outlined" style={{ color: '#4b5563', fontSize: '16px' }}>public</span>}>
+                                    <CollapsibleSection title="Macro Sentiment" defaultOpen={false} extraHeader={
+                                        <div style={{ display: 'flex', gap: 4 }}>
+                                            <span className="st-metric-badge" style={{ color: macroRateColor, borderColor: 'transparent', background: 'var(--bg-card)', padding: '2px 6px' }}>Rates: {macro.rates}</span>
+                                        </div>
+                                    }>
                                         <div style={{ display: 'flex', flexDirection: 'column', gap: '12px' }}>
                                             <div className="st-macro-item">
                                                 <div className="st-macro-icon">
@@ -653,7 +661,7 @@ export default function App() {
                                 )}
 
                                 {/* Financial Health */}
-                                <CollapsibleSection title="Financial Health" defaultOpen={true}>
+                                <CollapsibleSection title="Financial Health" defaultOpen={false} extraHeader={<span className="st-metric-badge" style={{ color: 'var(--c-muted)', background: 'transparent', borderColor: 'var(--st-border)' }}>P/E: {f.pe_ratio?.toFixed(1) || '—'}</span>}>
                                     <div className="st-metric-grid">
                                         {[
                                             { label: 'P/E (TTM)', key: 'pe', val: f.pe_ratio, fmt: v => v?.toFixed(2) },
@@ -673,8 +681,13 @@ export default function App() {
                                 {/* DCF Model */}
                                 <CollapsibleSection
                                     title="DCF Model"
-                                    defaultOpen={true}
-                                    extraHeader={data.web_enriched ? <span className="st-web-badge"><span className="material-symbols-outlined" style={{ fontSize: 11 }}>language</span>Web-Enriched</span> : null}
+                                    defaultOpen={false}
+                                    extraHeader={
+                                        <div style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
+                                            <span className="st-metric-badge" style={{ color: fvColor, borderColor: 'transparent', background: 'var(--bg-card)' }}>FV: ${fv?.toFixed(2) || '—'}</span>
+                                            {data.web_enriched ? <span className="st-web-badge" style={{ padding: '2px 4px' }}><span className="material-symbols-outlined" style={{ fontSize: 11 }}>language</span></span> : null}
+                                        </div>
+                                    }
                                 >
                                     <div className="st-dcf-rows">
                                         <div className="st-dcf-row"><span>Free Cash Flow</span><span className="st-dcf-val">{fmtLarge(data.latest_fcf)}</span></div>
@@ -718,7 +731,7 @@ export default function App() {
                                 </CollapsibleSection>
 
                                 {/* Sentiment */}
-                                <CollapsibleSection title="Sentiment" defaultOpen={true}>
+                                <CollapsibleSection title="Sentiment" defaultOpen={false} extraHeader={<span className="st-metric-badge" style={{ color: sentColor, background: `${sentColor}15`, borderColor: `${sentColor}33` }}>{sentLabel.toUpperCase()}</span>}>
                                     <div className="st-sent-header" style={{ background: `${sentColor}08`, borderColor: `${sentColor}1a` }}>
                                         <div className="st-sent-icon" style={{ background: `${sentColor}15` }}>
                                             <span className="material-symbols-outlined" style={{ color: sentColor, fontSize: 14 }}>{sentPositive ? 'trending_up' : 'trending_down'}</span>
@@ -749,7 +762,7 @@ export default function App() {
                                 </CollapsibleSection>
 
                                 {/* Technicals */}
-                                <CollapsibleSection title="Technicals" defaultOpen={true}>
+                                <CollapsibleSection title="Technicals" defaultOpen={false} extraHeader={<span className="st-metric-badge" style={{ color: rsi > 70 ? 'var(--c-red)' : rsi < 30 ? 'var(--c-green)' : 'var(--c-yellow)', background: 'transparent', borderColor: 'var(--st-border)' }}>RSI: {rsi?.toFixed(1) || '—'}</span>}>
                                     <div className="st-tech-rsi">
                                         <div className="st-tech-rsi-label">RSI (14)</div>
                                         <div className="st-tech-rsi-right">
