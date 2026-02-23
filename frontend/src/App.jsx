@@ -366,24 +366,24 @@ export default function App() {
                                                     Add to Portfolio
                                                 </button>
                                             </div>
-                                            <div className="st-hero-price-row" style={{ display: 'flex', alignItems: 'baseline', gap: '16px', marginTop: '4px' }}>
-                                                <div style={{ display: 'flex', alignItems: 'baseline', gap: '12px' }}>
-                                                    <span className="st-hero-price">${price?.toFixed(2)}</span>
+                                            <div className="st-hero-price-row" style={{ display: 'flex', alignItems: 'center', gap: '20px', marginTop: '4px' }}>
+                                                <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
+                                                    <span className="st-hero-price" style={{ lineHeight: '1' }}>${price?.toFixed(2)}</span>
                                                     {upside != null && (
-                                                        <div className={`st-hero-change ${upside >= 0 ? 'green' : 'red'}`}>
-                                                            <span className="material-symbols-outlined" style={{ fontSize: 14 }}>
+                                                        <div className={`st-hero-change ${upside >= 0 ? 'green' : 'red'}`} style={{ display: 'flex', alignItems: 'center', gap: '4px' }}>
+                                                            <span className="material-symbols-outlined" style={{ fontSize: 18 }}>
                                                                 {upside >= 0 ? 'arrow_upward' : 'arrow_downward'}
                                                             </span>
-                                                            <span>{Math.abs(upside).toFixed(2)}%</span>
+                                                            <span style={{ fontSize: '16px', fontWeight: '600' }}>{Math.abs(upside).toFixed(2)}%</span>
                                                         </div>
                                                     )}
                                                 </div>
                                                 {data.signal?.momentum_target && (
                                                     <>
-                                                        <div style={{ width: '1px', height: '32px', background: 'var(--st-border)', alignSelf: 'center' }}></div>
-                                                        <div style={{ display: 'flex', flexDirection: 'column' }}>
-                                                            <span style={{ fontSize: '9px', color: '#6b7280', textTransform: 'uppercase', fontWeight: 'bold', letterSpacing: '0.1em' }}>Target Price</span>
-                                                            <span style={{ fontSize: '18px', fontWeight: 'bold', fontFamily: 'var(--font-mono)', color: 'var(--c-blue)' }}>${data.signal.momentum_target.toFixed(2)}</span>
+                                                        <div style={{ width: '1px', height: '36px', background: 'var(--st-border)' }}></div>
+                                                        <div style={{ display: 'flex', flexDirection: 'column', justifyContent: 'center', gap: '2px' }}>
+                                                            <span style={{ fontSize: '10px', color: '#6b7280', textTransform: 'uppercase', fontWeight: 'bold', letterSpacing: '0.1em', lineHeight: '1' }}>Target Price</span>
+                                                            <span style={{ fontSize: '20px', fontWeight: 'bold', fontFamily: 'var(--font-mono)', color: 'var(--c-blue)', lineHeight: '1' }}>${data.signal.momentum_target.toFixed(2)}</span>
                                                         </div>
                                                     </>
                                                 )}
