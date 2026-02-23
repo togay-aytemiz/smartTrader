@@ -21,6 +21,7 @@ import AiAnalysisCard from './components/AiAnalysisCard';
 import MetricsBanner from './components/MetricsBanner';
 import ConvergenceBlock from './components/ConvergenceBlock';
 import CollapsibleSection from './components/CollapsibleSection';
+import Watchlist from './components/Watchlist';
 const API = 'http://localhost:8000';
 
 
@@ -148,6 +149,7 @@ export default function App() {
     const [chartPeriod, setChartPeriod] = useState('1Y');
     const [loadingStep, setLoadingStep] = useState(0);
     const [recent, setRecent] = useState(() => JSON.parse(localStorage.getItem('st_recent') || '[]'));
+    const [watchlist, setWatchlist] = useState(() => JSON.parse(localStorage.getItem('st_watchlist') || '[]'));
     const [showNewsModal, setShowNewsModal] = useState(false);
     const [showTokenTooltip, setShowTokenTooltip] = useState(false);
     const [initialTrade, setInitialTrade] = useState(null);
@@ -159,10 +161,28 @@ export default function App() {
         return () => clearInterval(iv);
     }, [loading]);
 
+    // Auto-save watchlist
+    useEffect(() => {
+        localStorage.setItem('st_watchlist', JSON.stringify(watchlist));
+    }, [watchlist]);
+
     const saveRecent = (t) => {
         const next = [t, ...recent.filter(x => x !== t)].slice(0, 5);
         setRecent(next);
         localStorage.setItem('st_recent', JSON.stringify(next));
+    };
+
+    const addToWatchlist = () => {
+        if (!data) return;
+        const snapshot = {
+            id: Date.now().toString(),
+            date: new Date().toISOString(),
+            data: data
+        };
+        setWatchlist(prev => {
+            const filtered = prev.filter(item => item.data.ticker !== data.ticker);
+            return [snapshot, ...filtered];
+        });
     };
 
     const analyze = useCallback(async (sym) => {
@@ -197,6 +217,11 @@ export default function App() {
     const aiMomentumStr = isStructured && aiData.momentum_signal ? aiData.momentum_signal : null;
 
     // Derived data
+    const adv = data?.advanced_metrics || {};
+    const { volatility = null, institutional_flow: flow = null, macro = null } = adv;
+    const macroRateColor = macro?.rates === "Headwind" ? "var(--c-red)" : macro?.rates === "Tailwind" ? "var(--c-green)" : "var(--c-yellow)";
+    const macroInfColor = macro?.inflation === "Headwind" ? "var(--c-red)" : macro?.inflation === "Tailwind" ? "var(--c-green)" : "var(--c-yellow)";
+
     const sig = data?.signal;
     const price = data?.fundamentals?.price;
     const fv = data?.fair_value;
@@ -259,6 +284,7 @@ export default function App() {
                                 <div className="st-nav-links">
                                     <a href="#" className={view === 'search' ? 'active' : ''} onClick={(e) => { e.preventDefault(); setView('search'); }}>Search</a>
                                     <a href="#" className={view === 'portfolio' ? 'active' : ''} onClick={(e) => { e.preventDefault(); setView('portfolio'); }}>Portfolio</a>
+                                    <a href="#" className={view === 'watchlist' ? 'active' : ''} onClick={(e) => { e.preventDefault(); setView('watchlist'); }}>Watchlist</a>
                                 </div>
                             </>
                         )}
@@ -279,6 +305,8 @@ export default function App() {
 
             {view === 'portfolio' ? (
                 <Portfolio initialTrade={initialTrade} />
+            ) : view === 'watchlist' ? (
+                <Watchlist watchlist={watchlist} setWatchlist={setWatchlist} onLoadSnapshot={(snapData) => { setData(snapData); setTicker(snapData.ticker); setView('search'); }} />
             ) : (
                 <>
                     {/* ═══ LANDING PAGE ═══ */}
@@ -361,20 +389,36 @@ export default function App() {
                                                         </>);
                                                     })()}
                                                 </div>
-                                                <button
-                                                    style={{
-                                                        display: 'flex', alignItems: 'center', gap: '4px', padding: '2px 8px', borderRadius: '2px',
-                                                        background: 'rgba(10, 132, 255, 0.1)', border: '1px solid rgba(10, 132, 255, 0.2)',
-                                                        color: 'var(--c-blue)', fontSize: '9px', fontWeight: 'bold', textTransform: 'uppercase',
-                                                        cursor: 'pointer', marginLeft: '8px', transition: 'background 0.15s'
-                                                    }}
-                                                    onMouseOver={e => e.currentTarget.style.background = 'rgba(10, 132, 255, 0.2)'}
-                                                    onMouseOut={e => e.currentTarget.style.background = 'rgba(10, 132, 255, 0.1)'}
-                                                    onClick={() => openPortfolioWithTrade(data.ticker, price)}
-                                                >
-                                                    <span className="material-symbols-outlined" style={{ fontSize: '12px' }}>add</span>
-                                                    Add to Portfolio
-                                                </button>
+                                                <div style={{ display: 'flex', alignItems: 'center', gap: '8px', marginLeft: '8px' }}>
+                                                    <button
+                                                        style={{
+                                                            display: 'flex', alignItems: 'center', gap: '4px', padding: '2px 8px', borderRadius: '2px',
+                                                            background: 'rgba(10, 132, 255, 0.1)', border: '1px solid rgba(10, 132, 255, 0.2)',
+                                                            color: 'var(--c-blue)', fontSize: '9px', fontWeight: 'bold', textTransform: 'uppercase',
+                                                            cursor: 'pointer', transition: 'background 0.15s'
+                                                        }}
+                                                        onMouseOver={e => e.currentTarget.style.background = 'rgba(10, 132, 255, 0.2)'}
+                                                        onMouseOut={e => e.currentTarget.style.background = 'rgba(10, 132, 255, 0.1)'}
+                                                        onClick={() => openPortfolioWithTrade(data.ticker, price)}
+                                                    >
+                                                        <span className="material-symbols-outlined" style={{ fontSize: '12px' }}>add</span>
+                                                        Add to Portfolio
+                                                    </button>
+                                                    <button
+                                                        style={{
+                                                            display: 'flex', alignItems: 'center', gap: '4px', padding: '2px 8px', borderRadius: '2px',
+                                                            background: 'rgba(255, 149, 0, 0.1)', border: '1px solid rgba(255, 149, 0, 0.2)',
+                                                            color: 'var(--c-yellow)', fontSize: '9px', fontWeight: 'bold', textTransform: 'uppercase',
+                                                            cursor: 'pointer', transition: 'background 0.15s'
+                                                        }}
+                                                        onMouseOver={e => e.currentTarget.style.background = 'rgba(255, 149, 0, 0.2)'}
+                                                        onMouseOut={e => e.currentTarget.style.background = 'rgba(255, 149, 0, 0.1)'}
+                                                        onClick={addToWatchlist}
+                                                    >
+                                                        <span className="material-symbols-outlined" style={{ fontSize: '12px' }}>bookmark</span>
+                                                        Save to Watchlist
+                                                    </button>
+                                                </div>
                                             </div>
                                             <div className="st-hero-price-row" style={{ display: 'flex', alignItems: 'center', gap: '20px', marginTop: '4px' }}>
                                                 <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
