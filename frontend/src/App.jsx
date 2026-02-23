@@ -17,7 +17,9 @@ import './index.css';
 import StockChart from './components/StockChart';
 import Portfolio from './components/Portfolio';
 import HeroBanner from './components/HeroBanner';
-
+import AiAnalysisCard from './components/AiAnalysisCard';
+import MetricsBanner from './components/MetricsBanner';
+import ConvergenceBlock from './components/ConvergenceBlock';
 const API = 'http://localhost:8000';
 
 
@@ -412,6 +414,8 @@ export default function App() {
                                     </div>
                                 </section>
 
+                                {data.advanced_metrics && <MetricsBanner data={data} />}
+
                                 {/* AI Analysis — redesigned inline */}
                                 <section className="st-section st-ai-section">
                                     <div className="st-ai-head" style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
@@ -498,6 +502,9 @@ export default function App() {
 
                             {/* ─── RIGHT SIDEBAR ─── */}
                             <aside className="st-right">
+                                {/* AI Convergence */}
+                                {data.advanced_metrics && <ConvergenceBlock data={data} />}
+
                                 {/* Financial Health */}
                                 <div className="st-sidebar-section">
                                     <h3 className="st-sidebar-title">Financial Health</h3>

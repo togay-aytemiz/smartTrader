@@ -796,6 +796,146 @@ def analyze_stock(ticker: str) -> dict:
     from sentiment import analyze_sentiment
     sentiment = analyze_sentiment(ticker, news_raw)
 
+    from sentiment import analyze_sentiment
+    sentiment = analyze_sentiment(ticker, news_raw)
+
+    # ── Advanced Metrics ───────────────────────────────────────────────────────
+    
+    # 1. Volatility Analysis (30D)
+    if len(close_prices) >= 30:
+        last_30_closes = close_prices.iloc[-30:]
+        returns = np.diff(last_30_closes) / last_30_closes[:-1]
+        historical_volatility = float(np.std(returns) * np.sqrt(252))
+        
+        last_252_closes = close_prices.iloc[-min(252, len(close_prices)):]
+        returns_1y = np.diff(last_252_closes) / last_252_closes[:-1]
+        volatility_1y = float(np.std(returns_1y) * np.sqrt(252))
+        
+        vol_diff_pct = (historical_volatility - volatility_1y) / volatility_1y if volatility_1y else 0
+        
+        if len(valid) >= 30:
+            last_30_valid = valid[-30:]
+            ranges = [(h - l) / c for _, _, h, l, c, _ in last_30_valid if c > 0 and h is not None and l is not None]
+            avg_range = float(np.mean(ranges)) if ranges else 0
+        else:
+            avg_range = 0
+    else:
+        historical_volatility = 0
+        volatility_1y = 0
+        vol_diff_pct = 0
+        avg_range = 0
+
+    volatility_metrics = {
+        "implied_volatility": round(historical_volatility * 100, 1), # using hist val as proxy
+        "volatility_1y": round(volatility_1y * 100, 1),
+        "vol_diff_pct": round(vol_diff_pct * 100, 1),
+        "avg_range_pct": round(avg_range * 100, 2),
+    }
+
+    # 2. Institutional Flow (Whale Activity) - Proxy via Volume Spikes
+    avg_vol = fundamentals.get("avg_volume") or sum(volumes[-20:])/20 if volumes else 1
+    whale_buy_vol = 0
+    whale_sell_vol = 0
+    if len(valid) > 20:
+        last_20_valid = valid[-20:]
+        for _, o, h, l, c, v in last_20_valid:
+            if v and v > avg_vol * 1.2 and o is not None:
+                if c > o:
+                    whale_buy_vol += v * c
+                else:
+                    whale_sell_vol += v * c
+    
+    total_whale_vol = whale_buy_vol + whale_sell_vol
+    if total_whale_vol > 0:
+        buy_pressure_pct = whale_buy_vol / total_whale_vol
+        sell_pressure_pct = whale_sell_vol / total_whale_vol
+    else:
+        buy_pressure_pct = 0.5
+        sell_pressure_pct = 0.5
+        
+    net_flow_usd = whale_buy_vol - whale_sell_vol
+    flow_status = "Whale Entry" if net_flow_usd > 0 else "Whale Exit" if net_flow_usd < 0 else "Neutral Flow"
+
+    institutional_flow = {
+        "buy_pressure_pct": round(buy_pressure_pct * 100, 1),
+        "sell_pressure_pct": round(sell_pressure_pct * 100, 1),
+        "net_flow_usd": net_flow_usd,
+        "flow_status": flow_status
+    }
+
+    # 3. Macro Sentiment (Sector based static mapping)
+    MACRO_MAPPING = {
+        "Technology": {"rates": "Headwind", "rates_desc": "High rates discount future cash flows", "inflation": "Neutral", "inflation_desc": "Pricing power offset by wage inflation", "overall": "BEARISH"},
+        "Healthcare": {"rates": "Neutral", "rates_desc": "Defensive sector, less rate sensitive", "inflation": "Tailwind", "inflation_desc": "Strong pricing power on inelastic goods", "overall": "BULLISH"},
+        "Financial Services": {"rates": "Tailwind", "rates_desc": "Higher net interest margins", "inflation": "Neutral", "inflation_desc": "Credit risks monitored", "overall": "BULLISH"},
+        "Energy": {"rates": "Neutral", "rates_desc": "Driven more by global demand", "inflation": "Tailwind", "inflation_desc": "Commodities hedge against inflation", "overall": "BULLISH"},
+        "Consumer Cyclical": {"rates": "Headwind", "rates_desc": "Higher borrowing costs dampen spending", "inflation": "Headwind", "inflation_desc": "Margin compression and demand destruction", "overall": "BEARISH"},
+        "Consumer Defensive": {"rates": "Neutral", "rates_desc": "Consistent dividend yields", "inflation": "Neutral", "inflation_desc": "Can pass costs, but volumes may drop", "overall": "NEUTRAL"},
+    }
+    macro_default = {"rates": "Neutral", "rates_desc": "Sector typical sensitivity", "inflation": "Neutral", "inflation_desc": "Standard inflation sensitivity", "overall": "NEUTRAL"}
+    
+    # Try exact match, otherwise default
+    macro_sentiment = macro_default
+    for key, val in MACRO_MAPPING.items():
+        if key.lower() in sector.lower() or sector.lower() in key.lower():
+            macro_sentiment = val
+            break
+
+    # 4. AI Convergence
+    convergence = {"bullish": 0, "bearish": 0, "neutral": 0, "total": 12}
+    def _add_sig(val):
+        if val > 0.5: convergence["bullish"] += 1
+        elif val < -0.5: convergence["bearish"] += 1
+        else: convergence["neutral"] += 1
+
+    fs = signal.get("factor_scores", {})
+    _add_sig(fs.get("dcf", 0))
+    _add_sig(fs.get("pe", 0))
+    _add_sig(fs.get("peg", 0))
+    _add_sig(fs.get("ev_ebitda", 0))
+    _add_sig(fs.get("technical", 0))
+    
+    if rsi and rsi > 60: convergence["bullish"] += 1
+    elif rsi and rsi < 40: convergence["bearish"] += 1
+    else: convergence["neutral"] += 1
+    
+    if sma50 and current_price > sma50: convergence["bullish"] += 1
+    else: convergence["bearish"] += 1
+    
+    if sma200 and current_price > sma200: convergence["bullish"] += 1
+    else: convergence["bearish"] += 1
+        
+    if technicals.get("macd_bullish", False): convergence["bullish"] += 1
+    else: convergence["bearish"] += 1
+    
+    if fundamentals.get("roe") and fundamentals["roe"] > 0.15: convergence["bullish"] += 1
+    else: convergence["bearish"] += 1
+        
+    if fundamentals.get("net_margin") and fundamentals["net_margin"] > 0.10: convergence["bullish"] += 1
+    else: convergence["bearish"] += 1
+        
+    if fundamentals.get("revenue_growth") and fundamentals["revenue_growth"] > 0.10: convergence["bullish"] += 1
+    else: convergence["bearish"] += 1
+        
+    convergence_pct_bull = convergence["bullish"] / 12 * 100
+    convergence_pct_bear = convergence["bearish"] / 12 * 100
+    
+    if convergence_pct_bull > 60:
+        convergence["status"] = "Strong Bullish Convergence"
+        convergence["type"] = "BULLISH"
+    elif convergence_pct_bear > 60:
+        convergence["status"] = "Strong Bearish Convergence"
+        convergence["type"] = "BEARISH"
+    elif convergence_pct_bull > 40:
+        convergence["status"] = "Weak Bullish Convergence"
+        convergence["type"] = "BULLISH"
+    elif convergence_pct_bear > 40:
+        convergence["status"] = "Weak Bearish Convergence"
+        convergence["type"] = "BEARISH"
+    else:
+        convergence["status"] = "Mixed Signals"
+        convergence["type"] = "NEUTRAL"
+
     return {
         "ticker": ticker,
         "company_name": company_name,
@@ -809,4 +949,10 @@ def analyze_stock(ticker: str) -> dict:
         "chart_data": chart_data,
         "latest_fcf": latest_fcf,
         "sentiment": sentiment,
+        "advanced_metrics": {
+            "volatility": volatility_metrics,
+            "institutional_flow": institutional_flow,
+            "macro": macro_sentiment,
+            "convergence": convergence
+        }
     }
