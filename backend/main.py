@@ -148,6 +148,7 @@ Sector:    {analysis.get('sector')} / {analysis.get('industry')}
 Current price:       {_fmt(f.get('price'), '$')}
 DCF Fair Value:      {_fmt(analysis.get('fair_value'), '$')}
 DCF Upside:          {_fmt(sig.get('upside_pct'), suffix='%')}
+Momentum Signal:     {sig.get('momentum_signal')}
 Momentum Target:     {_fmt(sig.get('momentum_target'), '$')} (Driven by growth hype & technical trends)
 Intrinsic/share:     {_fmt(dcf.get('intrinsic_per_share'), '$')}
 FCF growth used:     {_fmt(dcf.get('fcf_growth_rate_used'), suffix='%', decimals=1)}
@@ -196,7 +197,7 @@ You must return a valid JSON object with the following exact keys:
   "summary": "1 sentence high-level overview of the verdict.",
   "pros": ["Pro point 1", "Pro point 2", "Pro point 3"],
   "cons": ["Con point 1", "Con point 2", "Con point 3"],
-  "reasoning": "A 2-3 sentence flowing paragraph explaining the verdict based on valuation, momentum target (hype trajectory), operations, and risks."
+  "reasoning": "A 2-3 sentence flowing paragraph explaining the verdict based on valuation, momentum target (hype trajectory), operations, and risks. YOU MUST EXPLICITLY MENTION THE MOMENTUM TARGET AND SIGNAL."
 }}
 Output ONLY valid JSON.
 """
