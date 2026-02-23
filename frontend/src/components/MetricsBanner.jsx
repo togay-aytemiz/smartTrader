@@ -34,13 +34,13 @@ export default function MetricsBanner({ data }) {
                         </div>
                     </div>
                     <div className="st-mini-cards">
-                        <div className="st-mini-card">
-                            <p className="st-metric-subtext" style={{ fontSize: '8px', marginBottom: '4px' }}>Beta (1Y proxy)</p>
-                            <p className="st-metric-val-large" style={{ fontSize: '12px' }}>{data.fundamentals?.beta?.toFixed(2) || '—'}</p>
+                        <div className="st-mini-card" style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', padding: '6px 8px' }}>
+                            <span className="st-metric-subtext" style={{ fontSize: '8px', marginBottom: 0, whiteSpace: 'nowrap' }}>BETA (1Y PROXY)</span>
+                            <span className="st-metric-val-large" style={{ fontSize: '12px', whiteSpace: 'nowrap' }}>{data.fundamentals?.beta?.toFixed(2) || '—'}</span>
                         </div>
-                        <div className="st-mini-card">
-                            <p className="st-metric-subtext" style={{ fontSize: '8px', marginBottom: '4px' }}>Avg Range</p>
-                            <p className="st-metric-val-large" style={{ fontSize: '12px' }}>{volatility.avg_range_pct}%</p>
+                        <div className="st-mini-card" style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', padding: '6px 8px' }}>
+                            <span className="st-metric-subtext" style={{ fontSize: '8px', marginBottom: 0, whiteSpace: 'nowrap' }}>AVG RANGE</span>
+                            <span className="st-metric-val-large" style={{ fontSize: '12px', whiteSpace: 'nowrap' }}>{volatility.avg_range_pct}%</span>
                         </div>
                     </div>
                 </div>
