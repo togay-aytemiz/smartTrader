@@ -131,6 +131,11 @@ def generate_ai_commentary(analysis: dict, tracker: TokenTracker) -> str | None:
     sent = analysis.get("sentiment", {})
     fs  = sig.get("factor_scores", {})
     sc  = dcf.get("scenarios", {})
+    adv = analysis.get("advanced_metrics", {})
+    vol = adv.get("volatility", {})
+    flow = adv.get("institutional_flow", {})
+    mac = adv.get("macro", {})
+    conv = adv.get("convergence", {})
 
     headlines = sent.get("top_headlines", [])[:3]
     hl_block = "\n".join(
@@ -176,6 +181,12 @@ RSI(14):             {_fmt(tech.get('rsi_14'), decimals=1)} → {sig.get('rsi_si
 SMA Trend:           {sig.get('sma_signal', 'N/A')}
 MACD:                {sig.get('macd_signal', 'N/A')}
 
+== ADVANCED INSIGHTS ==
+Volatility (30D):    {_fmt(vol.get('implied_volatility'), suffix='%')} | vs 1Y: {_fmt(vol.get('vol_diff_pct'), suffix='%')}
+Whale Activity:      {flow.get('flow_status', 'N/A')} (Net Flow: {_fmt(flow.get('net_flow_usd', 0)/1e6, '$', 'M')})
+Macro Sentiment:     {mac.get('overall', 'N/A')} (Rates: {mac.get('rates')} / Inflation: {mac.get('inflation')})
+AI Convergence:      {conv.get('status', 'N/A')} ({conv.get('bullish')}/{conv.get('total')} Indicators Bullish)
+
 == 5-FACTOR SIGNAL SCORES (range -2 to +2) ==
 DCF Valuation (25%): {_fmt(fs.get('dcf'), decimals=2)}
 P/E Ratio (20%):     {_fmt(fs.get('pe'), decimals=2)}
@@ -197,7 +208,7 @@ You must return a valid JSON object with the following exact keys:
   "summary": "1 sentence high-level overview of the verdict.",
   "pros": ["Pro point 1", "Pro point 2", "Pro point 3"],
   "cons": ["Con point 1", "Con point 2", "Con point 3"],
-  "reasoning": "A 2-3 sentence flowing paragraph explaining the verdict based on valuation, momentum target (hype trajectory), operations, and risks. YOU MUST EXPLICITLY MENTION THE MOMENTUM TARGET AND SIGNAL."
+  "reasoning": "A 2-3 sentence flowing paragraph explaining the verdict based on valuation, momentum target, advanced insights (Whale activity, volatility, macro conditions, and AI Convergence status), operations, and risks. YOU MUST EXPLICITLY MENTION THE MOMENTUM TARGET AND THE AI CONVERGENCE CONCENSUS."
 }}
 Output ONLY valid JSON.
 """
